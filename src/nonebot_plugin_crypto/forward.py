@@ -1,6 +1,10 @@
 """OneBot 合并转发消息工具。"""
 
-from nonebot.adapters.onebot.v11 import Bot, MessageEvent
+from nonebot.adapters.onebot.v11 import (
+    Bot,
+    GroupMessageEvent,
+    PrivateMessageEvent,
+)
 
 from .constants import FORWARD_CHUNK_SIZE
 
@@ -26,7 +30,9 @@ def build_forward_nodes(lines: list[str], user_id: str) -> list[dict[str, object
 
 
 async def send_forward_market_list(
-    bot: Bot, event: MessageEvent, lines: list[str]
+    bot: Bot,
+    event: GroupMessageEvent | PrivateMessageEvent,
+    lines: list[str],
 ) -> None:
     """根据消息类型发送交易对列表合并转发。"""
     nodes = build_forward_nodes(lines, bot.self_id)

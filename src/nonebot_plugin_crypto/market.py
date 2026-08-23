@@ -1,7 +1,11 @@
 """行情查询和交易对列表业务逻辑。"""
 
 import httpx
-from nonebot.adapters.onebot.v11 import Bot, MessageEvent
+from nonebot.adapters.onebot.v11 import (
+    Bot,
+    GroupMessageEvent,
+    PrivateMessageEvent,
+)
 from nonebot.adapters.onebot.v11.exception import ActionFailed, NetworkError
 
 from .binance import fetch_exchange_symbols, fetch_ticker_data
@@ -11,7 +15,11 @@ from .forward import send_forward_market_list
 from .symbols import search_symbols, split_symbol
 
 
-async def send_market_list(bot: Bot, event: MessageEvent, query: str) -> str | None:
+async def send_market_list(
+    bot: Bot,
+    event: GroupMessageEvent | PrivateMessageEvent,
+    query: str,
+) -> str | None:
     """获取、筛选并发送 Binance Spot 交易对列表。"""
     try:
         symbols = await fetch_exchange_symbols()

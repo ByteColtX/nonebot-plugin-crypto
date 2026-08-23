@@ -2,7 +2,11 @@
 
 from nonebot import on_command
 from nonebot.adapters import Message
-from nonebot.adapters.onebot.v11 import Bot, MessageEvent
+from nonebot.adapters.onebot.v11 import (
+    Bot,
+    GroupMessageEvent,
+    PrivateMessageEvent,
+)
 from nonebot.params import CommandArg
 
 from .constants import (
@@ -20,7 +24,7 @@ market_command = on_command("crypto", force_whitespace=True)
 @market_command.handle()
 async def handle_market_command(
     bot: Bot,
-    event: MessageEvent,
+    event: GroupMessageEvent | PrivateMessageEvent,
     args: Message = CommandArg(),
 ) -> None:
     """处理行情查询和交易对列表命令。"""
