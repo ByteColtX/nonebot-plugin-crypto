@@ -5,9 +5,9 @@
 
 ## 项目概况
 
-- 本项目是 Python 3.10 的 NoneBot 插件，使用 `uv` 管理环境和依赖。
-- Python 版本由 `.python-version` 和 `pyproject.toml` 固定为 3.10；不要使用其他
-  Python 版本创建项目环境。
+- 本项目是支持 Python 3.10 至 3.14 的 NoneBot 插件，使用 `uv` 管理环境和依赖。
+- `.python-version` 将本地开发环境默认固定为 3.10，CI 会覆盖验证 3.10 至 3.14；不要
+  使用低于 3.10 的 Python 版本创建项目环境。
 - 插件实现位于 `src/nonebot_plugin_crypto/`，按常量、符号处理、Binance 客户端、
   消息转发、业务逻辑和 handlers 拆分；测试位于 `tests/` 并按职责组织。
 - 测试应位于 `tests/`，文件命名为 `test_<module>.py`。Binance 网络请求必须使用

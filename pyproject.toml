@@ -3,7 +3,7 @@ name = "nonebot-plugin-crypto"
 version = "0.1.0"
 description = "基于 Binance API 的 NoneBot 加密货币行情插件"
 readme = "README.md"
-requires-python = "==3.10.*"
+requires-python = ">=3.10"
 authors = [{ name = "ByteColtX", email = "umk@live.com" }]
 dependencies = [
   "httpx>=0.27.0,<1.0.0",

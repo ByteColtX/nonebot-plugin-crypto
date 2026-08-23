@@ -5,7 +5,7 @@
 ## ✨ nonebot-plugin-crypto ✨
 [![LICENSE](https://img.shields.io/github/license/ByteColtX/nonebot-plugin-crypto.svg)](./LICENSE)
 [![pypi](https://img.shields.io/pypi/v/nonebot-plugin-crypto.svg)](https://pypi.python.org/pypi/nonebot-plugin-crypto)
-[![python](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org)
+[![python](https://img.shields.io/badge/python-3.10--3.14-blue.svg)](https://www.python.org)
 [![uv](https://img.shields.io/badge/package%20manager-uv-black?style=flat-square&logo=uv)](https://github.com/astral-sh/uv)
 <br/>
 [![ruff](https://img.shields.io/badge/code%20style-ruff-black?style=flat-square&logo=ruff)](https://github.com/astral-sh/ruff)
@@ -16,7 +16,7 @@
 ## 📖 介绍
 
 基于 Binance Public API 的 NoneBot 加密货币行情插件，支持实时行情和交易对列表查询。
-插件仅使用 `/crypto` 作为行情查询命令。
+插件仅使用 `/crypto` 作为行情查询命令，CI 验证 Python 3.10 至 3.14。
 
 ## 💿 安装
 
