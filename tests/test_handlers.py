@@ -7,7 +7,7 @@ from nonebot.adapters.onebot.v11 import Message
 import nonebot_plugin_crypto
 from fake import fake_group_message_event_v11
 from nonebot_plugin_crypto import handlers
-from nonebot_plugin_crypto.constants import HELP_TEXT
+from nonebot_plugin_crypto.constants import HELP_TEXT, POPULAR_SYMBOLS
 
 
 class MatcherFinished(Exception):
@@ -25,15 +25,15 @@ def finish_matchers(monkeypatch: pytest.MonkeyPatch) -> None:
     async def finish(message: object = None, **_kwargs: object) -> None:
         raise MatcherFinished(message)
 
-    for matcher in (handlers.market_command,):
+    for matcher in (handlers.market_command, handlers.popular_market):
         monkeypatch.setattr(matcher, "finish", finish)
 
 
-def test_package_entrypoint_registers_only_crypto_handler() -> None:
+def test_package_entrypoint_registers_crypto_and_popular_handlers() -> None:
     assert handlers.market_command.handlers
     assert "cmds=(('crypto',),)" in repr(handlers.market_command.rule)
     assert not hasattr(handlers, "market_list_command")
-    assert not hasattr(handlers, "popular_market")
+    assert handlers.popular_market.handlers
 
 
 def test_package_entrypoint_declares_nonebot_plugin_metadata() -> None:
@@ -49,6 +49,13 @@ def test_package_entrypoint_declares_nonebot_plugin_metadata() -> None:
     assert metadata.type == "application"
     assert metadata.homepage == "https://github.com/ByteColtX/nonebot-plugin-crypto"
     assert metadata.supported_adapters == {"~onebot.v11"}
+
+
+def test_popular_symbols_are_a_static_top_twenty_snapshot() -> None:
+    assert len(POPULAR_SYMBOLS) == 20
+    assert all(symbol.endswith("USDT") for symbol in POPULAR_SYMBOLS.values())
+    assert POPULAR_SYMBOLS["xrp"] == "XRPUSDT"
+    assert POPULAR_SYMBOLS["rlusd"] == "RLUSDUSDT"
 
 
 @pytest.mark.asyncio
@@ -109,3 +116,19 @@ async def test_handle_market_command_list_sends_forward_and_rejects_extra_args(
     with pytest.raises(MatcherFinished) as usage:
         await handlers.handle_market_command(bot, event, Message("list btc usdt"))
     assert usage.value.message == "用法：/crypto list [keyword]"
+
+
+@pytest.mark.asyncio
+async def test_handle_popular_market_uses_static_top_symbols(
+    monkeypatch: pytest.MonkeyPatch, finish_matchers: None
+) -> None:
+    build_reply = AsyncMock(return_value="XRP/USDT Market Data")
+    monkeypatch.setattr(handlers, "build_market_reply", build_reply)
+
+    with pytest.raises(MatcherFinished) as finished:
+        await handlers.handle_popular_market(
+            fake_group_message_event_v11(message=Message(" XRP "))
+        )
+
+    assert finished.value.message == "XRP/USDT Market Data"
+    build_reply.assert_awaited_once_with("XRPUSDT")

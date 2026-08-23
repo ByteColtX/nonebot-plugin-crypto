@@ -1,4 +1,6 @@
-"""NoneBot /crypto 命令 matcher。"""
+"""NoneBot /crypto 命令和热门币种快捷 matcher。"""
+
+import re
 
 from nonebot import on_command
 from nonebot.adapters import Message
@@ -8,17 +10,21 @@ from nonebot.adapters.onebot.v11 import (
     PrivateMessageEvent,
 )
 from nonebot.params import CommandArg
+from nonebot.plugin import on_regex
 
 from .constants import (
     HELP_ARGUMENTS,
     HELP_TEXT,
     LIST_COMMAND_MAX_ARGS,
     LIST_QUERY_INDEX,
+    POPULAR_PATTERN,
+    POPULAR_SYMBOLS,
 )
 from .market import build_market_reply, send_market_list
 from .symbols import normalize_symbol
 
 market_command = on_command("crypto", force_whitespace=True)
+popular_market = on_regex(POPULAR_PATTERN, flags=re.IGNORECASE)
 
 
 @market_command.handle()
@@ -61,3 +67,14 @@ async def handle_market_command(
         await market_command.finish("❌ symbol 格式无效，例如：BTC、ETHUSDT、SOL/USDT")
 
     await market_command.finish(await build_market_reply(symbol))
+
+
+@popular_market.handle()
+async def handle_popular_market(
+    event: GroupMessageEvent | PrivateMessageEvent,
+) -> None:
+    """处理静态热门币种榜单中的快捷查询。"""
+    keyword = event.get_plaintext().strip().casefold()
+    symbol = POPULAR_SYMBOLS.get(keyword)
+    if symbol is not None:
+        await popular_market.finish(await build_market_reply(symbol))

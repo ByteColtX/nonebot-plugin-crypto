@@ -3,13 +3,13 @@
 import re
 from collections.abc import Mapping
 
-from .constants import POPULAR_SYMBOLS, QUOTE_ASSETS
+from .constants import QUOTE_ASSETS, SYMBOL_ALIASES
 
 
 def normalize_symbol(value: str) -> str | None:
     """将用户输入规范化为 Binance 交易对。"""
     normalized = value.strip().upper().replace("/", "").replace("-", "")
-    popular_symbol = POPULAR_SYMBOLS.get(normalized.casefold())
+    popular_symbol = SYMBOL_ALIASES.get(normalized.casefold())
     if popular_symbol:
         return popular_symbol
     if normalized in QUOTE_ASSETS:
@@ -37,7 +37,7 @@ def search_symbols(
 ) -> tuple[Mapping[str, object], ...]:
     """按交易对、基础资产或报价资产搜索交易对。"""
     normalized_query = query.strip().upper().replace("/", "").replace("-", "")
-    popular_symbol = POPULAR_SYMBOLS.get(normalized_query.casefold())
+    popular_symbol = SYMBOL_ALIASES.get(normalized_query.casefold())
     if popular_symbol:
         normalized_query = popular_symbol.removesuffix("USDT")
 
