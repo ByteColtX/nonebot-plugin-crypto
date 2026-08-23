@@ -19,6 +19,7 @@ from .constants import (
     LIST_QUERY_INDEX,
     POPULAR_PATTERN,
     POPULAR_SYMBOLS,
+    SYMBOL_ALIASES,
 )
 from .market import build_market_reply, send_market_list
 from .symbols import normalize_symbol
@@ -75,6 +76,6 @@ async def handle_popular_market(
 ) -> None:
     """处理静态热门币种榜单中的快捷查询。"""
     keyword = event.get_plaintext().strip().casefold()
-    symbol = POPULAR_SYMBOLS.get(keyword)
+    symbol = POPULAR_SYMBOLS.get(keyword) or SYMBOL_ALIASES.get(keyword)
     if symbol is not None:
         await popular_market.finish(await build_market_reply(symbol))

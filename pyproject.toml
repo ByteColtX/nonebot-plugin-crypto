@@ -1,6 +1,6 @@
 [project]
 name = "nonebot-plugin-crypto"
-version = "0.1.1"
+version = "0.1.2"
 description = "基于 Binance API 的 NoneBot 加密货币行情插件"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -42,7 +42,7 @@ bump = "bump-my-version bump"
 show-bump = "bump-my-version show-bump"
 
 [tool.bumpversion]
-current_version = "0.1.1"
+current_version = "0.1.2"
 commit = true
 message = "release: 将版本从 {current_version} 更新至 {new_version}"
 tag = true

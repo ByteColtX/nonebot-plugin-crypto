@@ -119,16 +119,37 @@ async def test_handle_market_command_list_sends_forward_and_rejects_extra_args(
 
 
 @pytest.mark.asyncio
-async def test_handle_popular_market_uses_static_top_symbols(
-    monkeypatch: pytest.MonkeyPatch, finish_matchers: None
+@pytest.mark.parametrize(
+    ("keyword", "expected_symbol"),
+    [("XRP", "XRPUSDT"), ("btc", "BTCUSDT"), (" ETH ", "ETHUSDT")],
+)
+async def test_handle_popular_market_supports_snapshot_and_alias_symbols(
+    monkeypatch: pytest.MonkeyPatch,
+    finish_matchers: None,
+    keyword: str,
+    expected_symbol: str,
 ) -> None:
-    build_reply = AsyncMock(return_value="XRP/USDT Market Data")
+    build_reply = AsyncMock(return_value="Market Data")
     monkeypatch.setattr(handlers, "build_market_reply", build_reply)
 
     with pytest.raises(MatcherFinished) as finished:
         await handlers.handle_popular_market(
-            fake_group_message_event_v11(message=Message(" XRP "))
+            fake_group_message_event_v11(message=Message(keyword))
         )
 
-    assert finished.value.message == "XRP/USDT Market Data"
-    build_reply.assert_awaited_once_with("XRPUSDT")
+    assert finished.value.message == "Market Data"
+    build_reply.assert_awaited_once_with(expected_symbol)
+
+
+@pytest.mark.asyncio
+async def test_handle_popular_market_ignores_unknown_symbol(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    build_reply = AsyncMock()
+    monkeypatch.setattr(handlers, "build_market_reply", build_reply)
+
+    await handlers.handle_popular_market(
+        fake_group_message_event_v11(message=Message("unknown"))
+    )
+
+    build_reply.assert_not_awaited()
