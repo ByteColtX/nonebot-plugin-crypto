@@ -42,7 +42,12 @@ jobs:
 
       - name: Ensure GitHub Release
         run: |
-          if ! gh release view "${{ steps.version.outputs.TAG_NAME }}" >/dev/null 2>&1; then
+          if gh release view "${{ steps.version.outputs.TAG_NAME }}" >/dev/null 2>&1; then
+            gh release edit "${{ steps.version.outputs.TAG_NAME }}" \
+              --verify-tag \
+              --draft=false \
+              --title "${{ steps.version.outputs.TAG_NAME }}"
+          else
             gh release create "${{ steps.version.outputs.TAG_NAME }}" \
               --verify-tag \
               --generate-notes \
