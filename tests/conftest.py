@@ -1,16 +1,11 @@
-import sys
-from pathlib import Path
-
 import nonebot
 import pytest
 from nonebot.adapters.onebot.v11 import Adapter as OnebotV11Adapter
 from pytest_asyncio import is_async_test
 
-ROOT_DIR = Path(__file__).resolve().parents[1]
-if str(ROOT_DIR) not in sys.path:
-    sys.path.insert(0, str(ROOT_DIR))
-
 nonebot.init()
+
+from nonebot_plugin_crypto import binance
 
 
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
@@ -25,3 +20,10 @@ def initialize_nonebot() -> None:
     """为直接调用 matcher handler 的测试注册 OneBot 适配器。"""
     driver = nonebot.get_driver()
     driver.register_adapter(OnebotV11Adapter)
+
+
+@pytest.fixture(autouse=True)
+def reset_exchange_info_cache() -> None:
+    """避免交易对缓存污染不同测试。"""
+    binance._exchange_info_cache.expires_at = 0
+    binance._exchange_info_cache.symbols = ()

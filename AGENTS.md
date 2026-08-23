@@ -8,8 +8,8 @@
 - 本项目是 Python 3.10 的 NoneBot 插件，使用 `uv` 管理环境和依赖。
 - Python 版本由 `.python-version` 和 `pyproject.toml` 固定为 3.10；不要使用其他
   Python 版本创建项目环境。
-- 当前待迁移的插件实现位于项目根目录 `crypto.py`；目标包目录为
-  `src/nonebot_plugin_crypto/`。后续迁移时，应将实现放入目标包并同步补充测试。
+- 插件实现位于 `src/nonebot_plugin_crypto/`，按常量、符号处理、Binance 客户端、
+  消息转发、业务逻辑和 handlers 拆分；测试位于 `tests/` 并按职责组织。
 - 测试应位于 `tests/`，文件命名为 `test_<module>.py`。Binance 网络请求必须使用
   mock，测试不得依赖真实网络、账号或密钥。
 - 不得把凭证、个人配置或运行时数据写入代码库。
@@ -23,7 +23,7 @@ uv sync
 uv run pytest
 uv run ruff check .
 uv run ruff format --check .
-uv run pre-commit run --all-files
+uvx pre-commit run --all-files
 ```
 
 修改代码后至少运行相关测试和 `uv run ruff check .`；涉及格式时再运行
