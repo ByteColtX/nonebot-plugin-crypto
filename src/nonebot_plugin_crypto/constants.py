@@ -1,5 +1,7 @@
 """插件使用的常量。"""
 
+import re
+
 BINANCE_TICKER_URL = "https://api.binance.com/api/v3/ticker/24hr"
 BINANCE_EXCHANGE_INFO_URL = "https://api.binance.com/api/v3/exchangeInfo"
 EXCHANGE_INFO_CACHE_TTL = 300
@@ -73,7 +75,14 @@ QUOTE_ASSETS = (
     "VND",
     "DAI",
 )
-POPULAR_PATTERN = r"^\s*[A-Za-z][A-Za-z0-9]{1,9}\s*$"
+_POPULAR_PATTERN_ALTERNATIVES = sorted(
+    (
+        re.escape(keyword)
+        for keyword in frozenset(POPULAR_SYMBOLS) | frozenset(SYMBOL_ALIASES)
+    ),
+    key=lambda keyword: (-len(keyword), keyword),
+)
+POPULAR_PATTERN = rf"^\s*(?:{'|'.join(_POPULAR_PATTERN_ALTERNATIVES)})\s*$"
 HELP_TEXT = """Crypto Market Help
 
 Query market data:

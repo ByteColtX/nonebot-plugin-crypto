@@ -1,3 +1,4 @@
+import re
 from types import SimpleNamespace
 from unittest.mock import AsyncMock
 
@@ -7,7 +8,12 @@ from nonebot.adapters.onebot.v11 import Message
 import nonebot_plugin_crypto
 from fake import fake_group_message_event_v11
 from nonebot_plugin_crypto import handlers
-from nonebot_plugin_crypto.constants import HELP_TEXT, POPULAR_SYMBOLS
+from nonebot_plugin_crypto.constants import (
+    HELP_TEXT,
+    POPULAR_PATTERN,
+    POPULAR_SYMBOLS,
+    SYMBOL_ALIASES,
+)
 
 
 class MatcherFinished(Exception):
@@ -56,6 +62,18 @@ def test_popular_symbols_are_a_static_top_twenty_snapshot() -> None:
     assert all(symbol.endswith("USDT") for symbol in POPULAR_SYMBOLS.values())
     assert POPULAR_SYMBOLS["xrp"] == "XRPUSDT"
     assert POPULAR_SYMBOLS["rlusd"] == "RLUSDUSDT"
+
+
+def test_popular_pattern_matches_only_supported_shortcuts() -> None:
+    supported_keywords = frozenset(POPULAR_SYMBOLS) | frozenset(SYMBOL_ALIASES)
+
+    assert all(
+        re.fullmatch(POPULAR_PATTERN, keyword, flags=re.IGNORECASE)
+        for keyword in supported_keywords
+    )
+    assert re.fullmatch(POPULAR_PATTERN, "  BTC  ", flags=re.IGNORECASE)
+    assert not re.fullmatch(POPULAR_PATTERN, "cnm", flags=re.IGNORECASE)
+    assert not re.fullmatch(POPULAR_PATTERN, "abc123", flags=re.IGNORECASE)
 
 
 @pytest.mark.asyncio
