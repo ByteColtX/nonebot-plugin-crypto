@@ -92,6 +92,15 @@
 本插件使用 Binance Public API，无需配置 API Key、Secret 或 Access Token。请勿将个人
 配置、代理信息或其他敏感信息提交到代码仓库。
 
+如需通过代理访问 Binance API，可在 NoneBot 配置（如 `.env` 文件）中设置
+`crypto_proxy`：
+
+```dotenv
+CRYPTO_PROXY="http://127.0.0.1:7890"
+```
+
+`crypto_proxy` 留空时不使用代理，代理地址仅用于访问 Binance API。
+
 ## 🎉 使用
 
 ### 指令表

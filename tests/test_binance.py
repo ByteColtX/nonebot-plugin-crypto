@@ -89,3 +89,41 @@ async def test_fetch_exchange_symbols_rejects_invalid_payload(payload: object) -
     with patch.object(binance.httpx, "AsyncClient", lambda **_kwargs: client):
         with pytest.raises((TypeError, ValueError)):
             await binance.fetch_exchange_symbols()
+
+
+@pytest.mark.asyncio
+async def test_fetch_ticker_data_applies_configured_proxy(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    response = FakeResponse({"symbol": "BTCUSDT", "lastPrice": "100"})
+    client = FakeAsyncClient(response)
+    captured: dict[str, object] = {}
+
+    def fake_async_client(**kwargs: object) -> FakeAsyncClient:
+        captured.update(kwargs)
+        return client
+
+    monkeypatch.setattr(binance.plugin_config, "crypto_proxy", "http://127.0.0.1:7890")
+    with patch.object(binance.httpx, "AsyncClient", fake_async_client):
+        await binance.fetch_ticker_data("BTCUSDT")
+
+    assert captured == {"timeout": 10, "proxy": "http://127.0.0.1:7890"}
+
+
+@pytest.mark.asyncio
+async def test_fetch_exchange_symbols_passes_no_proxy_when_unset(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    payload = {"symbols": [{"symbol": "BTCUSDT", "status": "TRADING"}]}
+    client = FakeAsyncClient(FakeResponse(payload))
+    captured: dict[str, object] = {}
+
+    def fake_async_client(**kwargs: object) -> FakeAsyncClient:
+        captured.update(kwargs)
+        return client
+
+    monkeypatch.setattr(binance.plugin_config, "crypto_proxy", None)
+    with patch.object(binance.httpx, "AsyncClient", fake_async_client):
+        await binance.fetch_exchange_symbols()
+
+    assert captured == {"timeout": 20, "proxy": None}
